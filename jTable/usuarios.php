@@ -15,6 +15,12 @@ try
 		//Get records from database
 		$dao = new UsuariosDAO();
 		
+		function objectToArray($obj){		
+				
+			}
+
+
+		
 		$sqlu = "";
 		if(isset($_GET["nome"])and(!empty($_GET["nome"]))){
 			$sqlu .= " and nome like '%".$_GET['nome']."%' COLLATE utf8_general_ci";
@@ -25,14 +31,15 @@ try
 		$novalista = array();
 		foreach($lista as $l){
 			foreach($l as $l2){
-				$novalista[] =  array($l2->getId(), $l2->getIdtipousuario(), $l2->getUsuario(), $l2->getSenha(), $l2->getNome(), $l2->getEmail(), $l2->getAtivo(), $l2->getNovasenha());
+				//$novalista[] =  array("id" => $l2->getId(), "idtipousuario"=>$l2->getIdtipousuario(), "usuario"=>$l2->getUsuario(), "senha"=>$l2->getSenha(), "nome"=>$l2->getNome(), "email"=>$l2->getEmail(), "ativo"=>$l2->getAtivo(), "novasenha"=>$l2->getNovasenha());
+				$novalista[] = get_object_vars($l2);
 			}
 		}
 
 		//Return result to jTable
 		$jTableResult = array();
 		$jTableResult['Result'] = "OK";
-		$jTableResult['Records'] = $novalista;
+		$jTableResult['Records'] = objectToArray($lista);
 		$jTableResult['TotalRecordCount'] = count($jTableResult['Records']); //retorna o total de registros
 		print json_encode($jTableResult);
 	}

@@ -23,7 +23,7 @@ class UsuariosDAO{
 			include "../conecta.php";
 		}
 		
-		$sql = "select * from usuarios where ativo = 'sim' ".$condicoes." order by nome";		
+		$sql = "select * from usuarios where ativo = 'sim' ".$condicoes;		
 		$rs = $mysqli->query($sql);
 		
 		$listaUsuarios = array();
@@ -39,10 +39,8 @@ class UsuariosDAO{
 				$vo->setSenha($row[3]);
 				$vo->setNome($row[4]);
 				$vo->setEmail($row[5]);
-				$vo->setSetor($row[6]);
-				$vo->setSubordinadode($row[7]);
-				$vo->setAtivo($row[8]);
-				$vo->setNovasenha($row[9]);
+				$vo->setAtivo($row[6]);
+				$vo->setNovasenha($row[7]);
 				
 				$listaUsuarios[] = $vo;					
 			}

@@ -13,29 +13,27 @@ try
 	if($_GET["action"] == "list")
 	{
 		//Get records from database
-		$sqlu = "SELECT * from usuarios where ativo = 'sim'";
+		$dao = new UsuariosDAO();
 		
+		$sqlu = "";
 		if(isset($_GET["nome"])and(!empty($_GET["nome"]))){
 			$sqlu .= " and nome like '%".$_GET['nome']."%' COLLATE utf8_general_ci";
 		}
-		$sql2 = $sqlu;
 		$sqlu .= " ORDER BY " . $_GET["jtSorting"] . " LIMIT ".$_GET['jtStartIndex'].",".$_GET['jtPageSize'];
 		
-		$result = $mysqli->query($sqlu);
-		$result2 = $mysqli->query($sql2);
-		
-		//Add all records to an array
-		$rows = array();
-		while($row = $result->fetch_array())
-		{
-		    $rows[] = $row;
+		$lista[] = $dao->listar($sqlu);
+		$novalista = array();
+		foreach($lista as $l){
+			foreach($l as $l2){
+				$novalista[] =  array($l2->getId(), $l2->getIdtipousuario(), $l2->getUsuario(), $l2->getSenha(), $l2->getNome(), $l2->getEmail(), $l2->getAtivo(), $l2->getNovasenha());
+			}
 		}
 
 		//Return result to jTable
 		$jTableResult = array();
 		$jTableResult['Result'] = "OK";
-		$jTableResult['Records'] = $rows;
-		$jTableResult['TotalRecordCount'] = $result2->num_rows; //retorna o total de registros
+		$jTableResult['Records'] = $novalista;
+		$jTableResult['TotalRecordCount'] = count($jTableResult['Records']); //retorna o total de registros
 		print json_encode($jTableResult);
 	}
 	//Creating a new record (createAction)

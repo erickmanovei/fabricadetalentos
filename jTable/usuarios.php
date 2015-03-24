@@ -15,33 +15,21 @@ try
 		//Get records from database
 		$dao = new UsuariosDAO();
 		
-		function objectToArray($obj){		
-				
-			}
-
-
-		
+		//verifica se existe alguma condição extra		
 		$sqlu = "";
 		if(isset($_GET["nome"])and(!empty($_GET["nome"]))){
 			$sqlu .= " and nome like '%".$_GET['nome']."%' COLLATE utf8_general_ci";
 		}
 		$sqlu .= " ORDER BY " . $_GET["jtSorting"] . " LIMIT ".$_GET['jtStartIndex'].",".$_GET['jtPageSize'];
 		
-		$lista[] = $dao->listar($sqlu);
-		$novalista = array();
-		foreach($lista as $l){
-			foreach($l as $l2){
-				//$novalista[] =  array("id" => $l2->getId(), "idtipousuario"=>$l2->getIdtipousuario(), "usuario"=>$l2->getUsuario(), "senha"=>$l2->getSenha(), "nome"=>$l2->getNome(), "email"=>$l2->getEmail(), "ativo"=>$l2->getAtivo(), "novasenha"=>$l2->getNovasenha());
-				$novalista[] = get_object_vars($l2);
-			}
-		}
-
+				
 		//Return result to jTable
 		$jTableResult = array();
 		$jTableResult['Result'] = "OK";
-		$jTableResult['Records'] = objectToArray($lista);
-		$jTableResult['TotalRecordCount'] = count($jTableResult['Records']); //retorna o total de registros
+		$jTableResult['Records'] = $dao->listarArray($sqlu);
+		$jTableResult['TotalRecordCount'] = count($dao->listarArray()); //retorna o total de registros
 		print json_encode($jTableResult);
+		
 	}
 	//Creating a new record (createAction)
 	else if($_GET["action"] == "create")
@@ -49,28 +37,30 @@ try
 		$resultado = "OK";
 		$mensagem = "";
 		
+		$dao = new UsuariosDAO();
+		$vo = new UsuariosVO();
+		
 		if(($_POST['idtipousuario'] != 1) and ($tipo_usuario != 3)){
 			$resultado = "ERROR";
 			$mensagem = "Você não tem permissão para criar administradores.";
 			
 		}else{
-		//Insert record into database
-		$result = $mysqli->query("INSERT INTO usuarios(idtipousuario, usuario, senha, nome, email, ativo, novasenha) VALUES('".$_POST['idtipousuario']."', '".$_POST['usuario']."', '".$_POST['senha']."', '".$_POST['nome']."', '".$_POST['email']."', 'sim', 'sim')");
+			//Insert record into database
+			$vo->setIdtipousuario($_POST['idtipousuario']);
+			$vo->setUsuario($_POST['usuario']);
+			$vo->setSenha($_POST['senha']);
+			$vo->setNome($_POST['nome']);
+			$vo->setEmail($_POST['email']);
+			$vo->setAtivo("sim");
+			$vo->setNovasenha("sim");
+			$ultimoid = $dao->insert($vo);
 		}
 		
 	
 		//Get last inserted record (to return to jTable)
-		$result = $mysqli->query("select * FROM usuarios where id = LAST_INSERT_ID();");
-		$row = $result->fetch_array();
 		
-		enviarEmail($row[0], "Bem vindo ao sistema de Avaliação de Desempenho!", 
-		"Olá Sr(a). ".$row[4].",
-		<br><br>
-		Você agora já possui um usuário e senha para acessar o sistema de Avaliação de Desempenho!<br><br>
-		Os dados são os que seguem:<br><br>
-		Usuário: ".$row[2]."<br>
-		Senha: ".$row[3]."");
-
+		$row = $dao->listarArray("and id = '".$ultimoid."'");
+		
 		//Return result to jTable
 		$jTableResult = array();
 		$jTableResult['Result'] = $resultado;
@@ -81,6 +71,18 @@ try
 	//Updating a record (updateAction)
 	else if($_GET["action"] == "update")
 	{
+		$dao = new UsuariosDAO();
+		$vo = new UsuariosVO();
+		
+		$vo->setId($_POST['id']);
+		$vo->setIdtipousuario($_POST['idtipousuario']);
+		$vo->setUsuario($_POST['usuario']);
+		$vo->setSenha($_POST['senha']);
+		$vo->setNome($_POST['nome']);
+		$vo->setEmail($_POST['email']);
+		$vo->setAtivo("sim");
+		$vo->setNovasenha("sim");
+		
 		//Update record in database
 		$resultado = "OK";
 		$mensagem = "";
@@ -90,7 +92,7 @@ try
 			$mensagem = "Você não tem permissão para criar administradores.";
 			
 		}else{
-		$result = $mysqli->query("UPDATE usuarios SET idtipousuario = '" . $_POST['idtipousuario'] . "', nome = '" . $_POST['nome'] . "', email = '" . $_POST['email'] . "' WHERE id = '" . $_POST['id'] . "'");	
+			$dao->update($vo);
 		}
 
 		//Return result to jTable
@@ -102,6 +104,7 @@ try
 	//Deleting a record (deleteAction)
 	else if($_GET["action"] == "delete")
 	{
+		$dao = new UsuariosDAO();
 		//Delete from database
 		$resultado = "OK";
 		$mensagem = "";
@@ -110,7 +113,7 @@ try
 			$resultado = "ERROR";
 			$mensagem = "Você não tem permissão para esta operação.";			
 		}else{
-		$result = $mysqli->query("UPDATE usuarios set ativo = 'nao' WHERE id = " . $_POST['id'] . ";");
+			$dao->delete($_POST["id"]);
 		}
 		//Return result to jTable
 		$jTableResult = array();

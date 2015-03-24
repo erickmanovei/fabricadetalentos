@@ -10,8 +10,6 @@ class UsuariosVO{
 	private $nome;
 	private $email;
 	private $setor;
-	private $subordinadode;
-	private $ativo;
 	private $novasenha;
 	
 	public function getId(){
@@ -55,20 +53,6 @@ class UsuariosVO{
 	public function setEmail($email){
 		$this->email = $email;
 	}
-	
-	public function getSetor(){
-		return $this->setor;
-	}
-	public function setSetor($setor){
-		$this->setor = $setor;
-	}
-	
-	public function getSubordinadode(){
-		return $this->subordinadode;
-	}
-	public function setSubordinadode($subordinadode){
-		$this->subordinadode = $subordinadode;
-	}	
 	
 	public function getAtivo(){
 		return $this->ativo;

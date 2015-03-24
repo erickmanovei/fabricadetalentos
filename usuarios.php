@@ -102,7 +102,6 @@ if(isset($_POST["nome"])){
                                                 },
 												usuario: {
                                                     title: 'Usuário',
-													edit: false,
 													input: function (data) {
 														if (data.record) {
 																return '<input type="text" name="usuario" id="usuario" value="' + data.record.usuario + '" />';
@@ -113,7 +112,6 @@ if(isset($_POST["nome"])){
                                                 },
 												senha: {
 													list: false,
-													edit: false,
 													type: 'password',
                                                     title: 'Senha',
 													input: function (data) {
